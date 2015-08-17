@@ -3,7 +3,7 @@
 
 	if(isset($_POST["email"])){
 
-		$email = $_POST["email"];
+		$email = explode('@', $_POST["email"])[0];
 		$query = "SELECT * from user_access_token where email='$email'"; 
 		$result = mysqli_query($conn, $query);
 

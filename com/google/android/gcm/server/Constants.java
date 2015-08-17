@@ -23,8 +23,7 @@ public final class Constants {
   /**
    * Endpoint for sending messages.
    */
-  public static final String GCM_SEND_ENDPOINT =
-      "https://android.googleapis.com/gcm/send";
+  public static final String GCM_SEND_ENDPOINT="https://android.googleapis.com/gcm/send";
 
   /**
    * HTTP parameter for registration id.

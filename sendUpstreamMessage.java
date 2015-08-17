@@ -11,6 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -31,138 +37,96 @@ class messageInfo{
 }
 
 public class sendUpstreamMessage extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Put your Google API Server Key here
-	private static final String GOOGLE_SERVER_KEY = "AIzaSyBO1EeoxA7GqZ8iRvQZEdeX2rtL9266Lts";
-	static final String REGISTER_NAME = "name";
-	static final String MESSAGE_KEY = "message";
-	static final String TO_NAME = "toName";
-	static final String REG_ID_STORE = "GCMRegId.txt";
+    // Put your Google API Server Key here
+    private static final String GOOGLE_SERVER_KEY = "AIzaSyBO1EeoxA7GqZ8iRvQZEdeX2rtL9266Lts";
+    static final String REGISTER_NAME = "name";
+    static final String MESSAGE_KEY = "message";
+    static final String TO_NAME = "toName";
+    static final String REG_ID_STORE = "GCMRegId.txt";
+    String answer = "";
 
-	public sendUpstreamMessage() {
-		super();
-	}
+    public sendUpstreamMessage() {
+        super();
+    }
 
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		doPost(request, response);
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
+        doPost(request, response);
 
-	}
+    }
 
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
 
             PrintWriter out = response.getWriter();
             
-            String action="", id;
+            String action="";
             JSONParser jsonParser;
             JSONObject jsonObject;
-                try{
-                
+            JSONArray id = new JSONArray();
+            try{
                 BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
                 String json = br.readLine();
 
                 jsonParser = new JSONParser();
                 jsonObject = (JSONObject)jsonParser.parse(json);
-                id = (String)jsonObject.get("ids");
+                id =(JSONArray) jsonObject.get("ids");
                 action = (String)jsonObject.get("action");
-                }
-                catch(ParseException p){
-                    out.println("Parse Exception");
-                }
                 
-                out.println(action);
-//		if ("shareRegId".equalsIgnoreCase(action)) {
-//
-//			writeToFile(request.getParameter("name"),
-//					request.getParameter("regId"));
-//			request.setAttribute("pushStatus",
-//					"GCM Name and corresponding RegId Received.");
-//			request.getRequestDispatcher("index.jsp")
-//					.forward(request, response);
-//
-//		} 
-//                if ("sendMessage".equalsIgnoreCase(action)) {
-//                    
-//			try {
-//				String fromName = request.getParameter(REGISTER_NAME);
-//				String toName = request.getParameter(TO_NAME);
-//				String userMessage = request.getParameter(MESSAGE_KEY);
-//				Sender sender = new Sender(GOOGLE_SERVER_KEY);
-//				Message message = new Message.Builder().timeToLive(30)
-//						.delayWhileIdle(true).addData(MESSAGE_KEY, userMessage)
-//						.addData(REGISTER_NAME, fromName).build();
-//				Map regIdMap = readFromFile();
-//				String regId = regIdMap.get(toName).toString();
-//				Result result = sender.send(message, regId, 1);
-//				request.setAttribute("pushStatus", result.toString());
-//			} catch (IOException ioe) {
-//				ioe.printStackTrace();
-//				request.setAttribute("pushStatus",
-//						"RegId required: " + ioe.toString());
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				request.setAttribute("pushStatus", e.toString());
-//			}
-//			request.getRequestDispatcher("index.jsp")
-//					.forward(request, response);
-//		}
-//                else if ("multicast".equalsIgnoreCase(action)) {
-//
-//			try {
-//				String fromName = request.getParameter(REGISTER_NAME);
-//				String userMessage = request.getParameter(MESSAGE_KEY);
-//				Sender sender = new Sender(GOOGLE_SERVER_KEY);
-//				Message message = new Message.Builder().timeToLive(30)
-//						.delayWhileIdle(true).addData(MESSAGE_KEY, userMessage)
-//						.addData(REGISTER_NAME, fromName).build();
-//				Map regIdMap = readFromFile();
-//
-//				List regIdList = new ArrayList();
-//
-//				for (Entry entry : regIdMap.entrySet()) {
-//					regIdList.add(entry.getValue());
-//				}
-//
-//				MulticastResult multiResult = sender
-//						.send(message, regIdList, 1);
-//				request.setAttribute("pushStatus", multiResult.toString());
-//			} catch (IOException ioe) {
-//				ioe.printStackTrace();
-//				request.setAttribute("pushStatus",
-//						"RegId required: " + ioe.toString());
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				request.setAttribute("pushStatus", e.toString());
-//			}
-//			request.getRequestDispatcher("index.jsp")
-//					.forward(request, response);
-//		}
-	}
+                Class.forName("com.mysql.jdbc.Driver");
 
-	private void writeToFile(String name, String regId) throws IOException {
-		Map regIdMap = readFromFile();
-		regIdMap.put(name, regId);
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
-				REG_ID_STORE, false)));
-//		for (Map.Entry entry : regIdMap.entrySet()) {
-//			out.println(entry.getKey() + "," + entry.getValue());
-//		}
-		out.println(name + "," + regId);
-		out.close();
+                Connection c;
+                Statement s;
+                ResultSet r;
 
-	}
+                c = DriverManager.getConnection("jdbc:mysql://localhost:3306/nuconnect", "root", "root");
+                s = c.createStatement();
 
-	private Map readFromFile() throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(REG_ID_STORE));
-		String regIdLine = "";
-		Map regIdMap = new HashMap();
-		while ((regIdLine = br.readLine()) != null) {
-			String[] regArr = regIdLine.split(",");
-			regIdMap.put(regArr[0], regArr[1]);
-		}
-		br.close();
-		return regIdMap;
-	}
+
+                String query;
+                int len = id.size();
+                if ("extra lecture".equalsIgnoreCase(action)) {
+                try {
+                        for(int i=0; i<len; i++){
+                            query = "SELECT * from roll_reg_no where roll_no="+(String)id.get(i);
+                            r = s.executeQuery(query);
+                        
+                            String toName = (String)id.get(i);
+                            String userMessage = "Extra Lecture";
+                            String fromName = "1392";
+                            Sender sender = new Sender(GOOGLE_SERVER_KEY);
+                            Message message = new Message.Builder().timeToLive(30)
+                                            .delayWhileIdle(true).addData(MESSAGE_KEY, userMessage)
+                                            .addData(REGISTER_NAME, fromName).build();
+                            String regId = r.getString("reg_id");
+                            Result result = sender.send(message, regId, 1);
+                            answer = result.toString();
+                            request.setAttribute("pushStatus", result.toString());
+                    }
+                } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                         request.setAttribute("pushStatus",
+                                        "RegId required: " + ioe.toString());
+                } catch (Exception e) {
+                        e.printStackTrace();
+                         request.setAttribute("pushStatus", e.toString());
+                }
+                 // request.getRequestDispatcher("index.jsp")
+                 //                .forward(request, response);
+                }
+                out.println(answer+" Sent result");
+            }
+            catch(ParseException p){
+                    out.println("Parse Exception");
+            }
+            catch(SQLException e){
+                e.printStackTrace();
+            }
+            catch(ClassNotFoundException e){
+                e.printStackTrace();
+            }
+
+    }
 }

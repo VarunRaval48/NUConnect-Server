@@ -1,9 +1,10 @@
 <?php
 
 	if(isset($_POST["email"])){
-		$email = $_POST["email"];
 
 		require 'databaseSetup.php';
+
+		$email = explode('@', $_POST["email"])[0];
 
 		$query = "UPDATE user_access_token set log_status='0', logout_date=now() where email='$email'";
 

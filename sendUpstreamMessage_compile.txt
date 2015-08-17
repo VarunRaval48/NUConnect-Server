@@ -1,0 +1,1 @@
+javac -cp .;C:\xampp\htdocs\nuconnect\libs\* sendUpstreamMessage.java

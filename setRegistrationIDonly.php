@@ -3,7 +3,8 @@
 	if(isset($_POST["reg_id"]) && isset($_POST["email"])){
 
 		$reg_id = $_POST["reg_id"];
-		$email = explode('@', $_POST["email"])[0];
+		// $email = explode('@', $_POST["email"])[0];
+		$email = $_POST["email"];
 
 		$query = "SELECT * from roll_reg_no where roll_no='$email'"; 
 		$result = mysqli_query($conn, $query);

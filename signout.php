@@ -4,7 +4,8 @@
 
 		require 'databaseSetup.php';
 
-		$email = explode('@', $_POST["email"])[0];
+		// $email = explode('@', $_POST["email"])[0];
+		$email = $_POST["email"];
 
 		$query = "UPDATE user_access_token set log_status='0', logout_date=now() where email='$email'";
 

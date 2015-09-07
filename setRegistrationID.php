@@ -5,7 +5,8 @@
 	if(isset($_POST["reg_id"]) && isset($_POST["email"]) && isset($_POST["access_token"])){
 		
 		$reg_id = $_POST["reg_id"];
-		$email = explode('@', $_POST["email"])[0];
+		// $email = explode('@', $_POST["email"])[0];
+		$email = $_POST["email"];
 		$access_token = $_POST["access_token"];
 
 		$query = "SELECT * from user_access_token where email='$email'"; 

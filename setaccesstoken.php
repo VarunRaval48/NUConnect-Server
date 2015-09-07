@@ -5,8 +5,8 @@
 	if(isset($_POST["access_token"]) && isset($_POST["email"])){
 
 		$access_token = $_POST["access_token"];
-		$email = explode('@', $_POST["email"])[0];
-
+		// $email = explode('@', $_POST["email"])[0];
+		$email = $_POST["email"];
 
 		require 'databaseSetup.php';
 

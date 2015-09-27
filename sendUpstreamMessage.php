@@ -15,13 +15,15 @@
     $message = array(
         // "message_type" => $data->{'msg_type'},
         "inform_type" => $data->{'msg_type'},
-        "message" => $data->{'msg_content'},
+        "message_optional" => $data->{'msg_optional'},
         "date" => $data->{'date'},
         "time_from" => $data->{'time_from'},
         "time_to" => $data->{'time_to'},
         "venue" => $data->{'venue'},
-        "from_id" => $data->{'id'},
-        "from_name" => $data->{'name'},
+        "subject" => $data->{'subject'},
+        "from_id" => $data_decode->{'id'},
+        "from_name" => $data_decode->{'name'},
+        "action" => $data_decode->{'action'},
         );
 
     // Update your Google Cloud Messaging API Key

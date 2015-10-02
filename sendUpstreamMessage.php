@@ -6,8 +6,10 @@
     $json = file_get_contents("php://input");
     $data_decode = json_decode($json);
 
+
     $data = $data_decode->{'data'};
     $reg_ids = $data_decode->{'ids'};
+
 
     $gcmRegID  = "dd9A907QS3g:APA91bFo1R5ebRHYUsiOjK4hzFzYfSZXdalZtjHzgVZoMuJoYZ-SLz4_SMWh2AEgcvZL1x-WL-pD0l4_q46fy7lh9hYna82a1amGRu4EpxxcNoM6zsDV4QonWDEuCrb0_F8ptPsVXx8C";
     $registration_ids=array($gcmRegID);
@@ -15,7 +17,7 @@
     $message = array(
         // "message_type" => $data->{'msg_type'},
         "inform_type" => $data->{'msg_type'},
-        "message_optional" => $data->{'msg_optional'},
+        "msg_optional" => $data->{'msg_optional'},
         "date" => $data->{'date'},
         "time_from" => $data->{'time_from'},
         "time_to" => $data->{'time_to'},
@@ -24,7 +26,10 @@
         "from_id" => $data_decode->{'id'},
         "from_name" => $data_decode->{'name'},
         "action" => $data_decode->{'action'},
-        );
+    );
+
+    $query = "INSERT into extra_lecture_chats values ('$message')";
+    $result = mysqli_query($conn, $query);
 
     // Update your Google Cloud Messaging API Key
     define("GOOGLE_API_KEY", "AIzaSyBO1EeoxA7GqZ8iRvQZEdeX2rtL9266Lts");        

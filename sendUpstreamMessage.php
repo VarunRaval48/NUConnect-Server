@@ -8,28 +8,51 @@
 
 
     $data = $data_decode->{'data'};
-    $reg_ids = $data_decode->{'ids'};
+    $to_ids = $data_decode->{'ids'};
+    $to_ids_group = $data_decode->{'ids_group'};
 
 
     $gcmRegID  = "dd9A907QS3g:APA91bFo1R5ebRHYUsiOjK4hzFzYfSZXdalZtjHzgVZoMuJoYZ-SLz4_SMWh2AEgcvZL1x-WL-pD0l4_q46fy7lh9hYna82a1amGRu4EpxxcNoM6zsDV4QonWDEuCrb0_F8ptPsVXx8C";
     $registration_ids=array($gcmRegID);
 
+
+    $from_id = $data_decode->{'id'};
+    $from_name = $data_decode->{'name'};
+    $action = $data_decode->{'action'};
+    $date_sent_on = $data_decode->{'date_sent_on'};
+    $msg_type = $data_decode->{'msg_type'};
+
+    // $query = "SELECT msg_id from message_details_extralecture where from_id='$from_id'";
+    $query = "SELECT msg_id from message_details_extralecture where from_id='$from_id' order by msg_id desc limit 1";
+    $result_query = mysqli_query($conn, $query);
+    if(mysqli_num_rows($result_query)>0){
+        $row = mysqli_fetch_assoc($result_query);
+        $msg_id = $row["msg_id"] + 1;
+    }
+    else{
+        $msg_id = 1;
+    }
+
     $message = array(
         // "message_type" => $data->{'msg_type'},
-        "inform_type" => $data->{'msg_type'},
         "msg_optional" => $data->{'msg_optional'},
-        "date" => $data->{'date'},
-        "time_from" => $data->{'time_from'},
-        "time_to" => $data->{'time_to'},
-        "venue" => $data->{'venue'},
-        "subject" => $data->{'subject'},
-        "from_id" => $data_decode->{'id'},
-        "from_name" => $data_decode->{'name'},
-        "action" => $data_decode->{'action'},
+        "date" => $data->{'d'},
+        "time_from" => $data->{'t_f'},
+        "time_to" => $data->{'t_t'},
+        "venue" => $data->{'v'},
+        "subject" => $data->{'s'},
+        "from_id" => $from_id,
+        "from_name" => $from_name,
+        "action" => $action,
+        "date_sent_on" => $date_sent_on,
+        "inform_type" => $msg_type,
     );
 
-    $query = "INSERT into extra_lecture_chats values ('$message')";
-    $result = mysqli_query($conn, $query);
+    $data = json_encode($data);
+    $query = "INSERT into message_details_extralecture (msg_id, from_id, from_name, msg_type, data, date_sent_on) 
+        values ($msg_id , '$from_id', '$from_name', '$msg_type', '$data', '$date_sent_on')";
+    mysqli_query($conn, $query);
+
 
     // Update your Google Cloud Messaging API Key
     define("GOOGLE_API_KEY", "AIzaSyBO1EeoxA7GqZ8iRvQZEdeX2rtL9266Lts");        
@@ -48,9 +71,19 @@
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     
     $result = "";
-    foreach ($reg_ids as $reg_id) {
 
-        $query = "select reg_id from roll_reg_no where roll_no='$reg_id'";
+    //TODO Insert msg_id to receipents_extralecture
+    foreach ($to_ids_group as $to_id_group) {
+        $query = "INSERT into receipents_extralecture values ('$msg_id', 'to_id')";
+        mysqli_query($conn, $query);
+    }
+
+    foreach ($to_ids as $to_id) {
+
+        $query = "INSERT into receipents_extralecture values ('$msg_id', '$to_id')";
+        mysqli_query($conn, $query);
+
+        $query = "select reg_id from roll_reg_no where roll_no='$to_id'";
         $result_query = mysqli_query($conn, $query);
         $row = mysqli_fetch_assoc($result_query);
 
@@ -73,5 +106,7 @@
         }
         curl_close($ch);
     }
+    mysqli_close($conn);
+    
     return $result;
 ?>

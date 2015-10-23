@@ -18,7 +18,8 @@
 			$row = mysqli_fetch_assoc($result);
 			if($row["access_token"]!=$access_token){
 				$query = "UPDATE user_access_token SET access_token='$access_token', log_status='1', login_date=now() where email='$email'";
-				$result = mysqli_query($conn, $query);$flag=1;
+				$result = mysqli_query($conn, $query);
+				$flag=1;
 			}
 			if($flag==0){
 				$query = "UPDATE user_access_token SET log_status='1', login_date=now() where email='$email'";

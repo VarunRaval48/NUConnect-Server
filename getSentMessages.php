@@ -17,7 +17,6 @@
 				$data = json_decode($data);
 				$data_array = array(
 					'msg_optional'=>$data->{'msg_optional'},
-					'msg_type'=>$data->{'msg_type'},
 					'd'=>$data->{'d'},
 					't_f'=>$data->{'t_f'},
 					't_t'=>$data->{'t_t'},
@@ -25,15 +24,19 @@
 					's'=>$data->{'s'},
 				);
 				$array = array(
-					'm_i'=>$row["msg_id"],
-					'f_i'=>$row["from_id"],
-					'f_n'=>$row["from_name"],
-					'd_s'=>$row["date_sent_on"],
+					'msg_type'=>$row["msg_type"],
+					'msg_id'=>$row["msg_id"],
+					'from_id'=>$row["from_id"],
+					'from_name'=>$row["from_name"],
+					'date_sent_on'=>$row["date_sent_on"],
 					'data'=>$data_array,
 				);
 				array_push($result, $array);
 			}
 			print(json_encode($result));
+		}
+		else{
+			print('0');
 		}
 	}
 ?>

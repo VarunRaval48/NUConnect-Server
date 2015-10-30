@@ -15,13 +15,11 @@
     $gcmRegID  = "dd9A907QS3g:APA91bFo1R5ebRHYUsiOjK4hzFzYfSZXdalZtjHzgVZoMuJoYZ-SLz4_SMWh2AEgcvZL1x-WL-pD0l4_q46fy7lh9hYna82a1amGRu4EpxxcNoM6zsDV4QonWDEuCrb0_F8ptPsVXx8C";
     $registration_ids=array($gcmRegID);
 
-
     $from_id = $data_decode->{'id'};
     $from_name = $data_decode->{'name'};
     $action = $data_decode->{'action'};
     $date_sent_on = $data_decode->{'date_sent_on'};
     $msg_type = $data_decode->{'msg_type'};
-
     // $query = "SELECT msg_id from message_details_extralecture where from_id='$from_id'";
     $query = "SELECT msg_id from message_details_extralecture where from_id='$from_id' order by msg_id desc limit 1";
     $result_query = mysqli_query($conn, $query);
@@ -33,8 +31,10 @@
         $msg_id = 1;
     }
 
+    //Single level of tree in json message sent
     $message = array(
         // "message_type" => $data->{'msg_type'},
+        "msg_id" => $msg_id,
         "msg_optional" => $data->{'msg_optional'},
         "date" => $data->{'d'},
         "time_from" => $data->{'t_f'},
@@ -45,7 +45,7 @@
         "from_name" => $from_name,
         "action" => $action,
         "date_sent_on" => $date_sent_on,
-        "inform_type" => $msg_type,
+        "msg_type" => $msg_type,
     );
 
     $data = json_encode($data);
